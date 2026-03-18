@@ -1,4 +1,23 @@
-# How Heapq works in BPE
+# BPE
+
+## BPE Training
+
+The pseudo code on page 15 is very simple:
+
+```text
+function BYTE-PAIR ENCODING (strings C, number of merges k) returns vocab V
+    V← all unique characters in C # initial set of tokens is characters
+    for i = 1 to k do # merge tokens k times
+        t_L, t_R ← Most frequent pair of adjacent tokens in C
+        t_NEW ← t_L + t_R # make new token by concatenating
+        V← V + t_NEW # update the vocabulary
+        Replace each occurrence of t_L, t_R in C with tNEW # and update the corpus
+return V
+```
+
+## How Heapq works in BPE
+
+Industrial impelementation usually uses priority queue rather than loop the token each time.
 
 Example merge ranks:
 
