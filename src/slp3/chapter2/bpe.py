@@ -209,10 +209,21 @@ class BPETokenizerTrainer:
         if self.current_vocab_size >= target_vocab_size:
             return
         
+        
+
         # What if vocab len never reached k?
         # 持续合并，直到达到目标大小或无法继续
+        step = 0
         while self.current_vocab_size < target_vocab_size:
+            print(f'\nStep {step}:')
+            print(f'  Words before merge::')
+            for tw in self._words:
+                print(tw)
+
             pair_freq_table = self._compute_pair_freqencies()
+            print(f'  Pair frequencies:')
+            print(pair_freq_table)
+
             best_pair = pair_freq_table.get_most_frequent()
             # Sometimes BPE training stops when:
             # best_pair.frequency < 2
@@ -221,13 +232,17 @@ class BPETokenizerTrainer:
                 # What if we break in such case?
                 print(f"Stopped early: no more pairs to merge")
                 break
-            print(f'Merging {best_pair}')
             self._apply_merge_to_all_words(best_pair)
-            self._merges.append(best_pair.pair) # 每次 append，vocab_size +1
-            # 不立即构建 full vocab（可懒加载）
-            # vocab.append(best_pair.merged_token)
+            print(f'  After merged best pair: {best_pair}')
+            for tw in self._words:
+                print(tw)
 
-        # return Vocabulary(vocab)
+            self._merges.append(best_pair.pair) # 每次 append，vocab_size +1
+            print(f'  Merge rules:')
+            print(self._merges)
+            step += 1
+            print(f"Finished step {step}\n{'='*50}")
+
 
     def save(self, path: os.PathLike):
         with open(f'{path}/merges.txt', 'w') as f:
@@ -248,6 +263,8 @@ class BPETokenizerTrainer:
         with open(f'{path}/tokenizer_config.json', 'w') as f:
             json.dump(cfg, f, indent=2)
 
+
+# ===== BPE Traiing =====
 class MergeCandidate(BaseModel):
     position: int
     pair: Tuple[str, str]
