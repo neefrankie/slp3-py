@@ -69,6 +69,12 @@ r e ne w:  2
 r e s e t: 1
 ```
 
+and merge rule:
+
+```text
+(n e)
+```
+
 Now frequency of each ajacent pair:
 
 ```text
