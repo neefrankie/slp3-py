@@ -96,9 +96,6 @@ class TokenizedWord(BaseModel):
 
 SEPARATOR_RE = re.compile(r'([,.:;?_!"()\'\s]|--)')
 
-
-
-
 def basic_tokenizer(text: str) -> List[str]:
     result = SEPARATOR_RE.split(text)
     return [
