@@ -329,7 +329,7 @@ class TokenSequence:
         return self.tokens
 
 
-class BPTEncoding:
+class BPEEncoding:
     EOF = '<|endoftext|>'
     UNK = '<|unk|>'
 
@@ -452,7 +452,6 @@ if __name__ == '__main__':
         print('\nAfter merging n e:')
         print(word_renew)
     
-    words = ['set', 'new', 'new', 'renew', 'reset', 'renew']
     text = 'set new new renew reset renew'
     trainer = BPETokenizerTrainer(text)
     print('\nWord frequencies:')
@@ -479,7 +478,7 @@ if __name__ == '__main__':
     print('\nTrained vocab:')
     print(trainer.vocabulary)
 
-    bpe = BPTEncoding(
+    bpe = BPEEncoding(
         merges=trainer.merges,
         vocab=trainer.vocabulary
     )
