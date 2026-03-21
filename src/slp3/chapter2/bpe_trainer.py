@@ -1,8 +1,9 @@
 from collections import Counter
 from dataclasses import dataclass
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Tuple
+import regex
 
-from .pretokenizer import pre_tokenize, normalize
+from .pretokenizer import normalize
 from .printer import BytePrinter
 
 
@@ -58,17 +59,8 @@ class PairFrequencyTable:
         if not self._pairs:
             return None
         return max(self._pairs.values(), key=lambda pair: pair.frequency)
-    
-# U+2581 (Lower One Eighth Block)
-BOUNDARY_CHAR = '▁'
 
-def split_word(word: str, add_boundary_char: bool = True) -> List[bytes]:
-    if add_boundary_char:
-        word = BOUNDARY_CHAR + word
-    return [
-        bytes([b])
-        for b in word.encode('utf-8')
-    ]
+
 
 @dataclass
 class TokenizedWord:
@@ -77,11 +69,14 @@ class TokenizedWord:
     tokens: List[bytes]
 
     @classmethod
-    def from_text(cls, word: str, freq: int, add_boundary_char: bool = True) -> 'TokenizedWord':
+    def from_text(cls, word: str, freq: int) -> 'TokenizedWord':
         return cls(
             text=word,
             frequency=freq,
-            tokens=split_word(word, add_boundary_char)
+            tokens=[
+                bytes([b])
+                for b in word.encode('utf-8')
+            ]
         )
 
     def __str__(self):
@@ -112,15 +107,24 @@ class BPETrainer:
     def __init__(
             self,
             text: str,
-            specials: List[str] | None = None
+            pat_str: str
     ):
+        self.pat_str = pat_str
+        self.merges: List[Tuple[bytes, bytes]] = []
+        self.vocab = {
+            bytes([i])
+            for i in range(256)
+        }
+
         self._words: List[TokenizedWord] = self._preprocess(text)
-        self._specials = [
-            s.encode() for s in specials
-        ] if specials else [b'<|endoftext|>', b'<|unk|>']
-        self._merges: List[Tuple[bytes, bytes]] = []
-        self._vocabulary: List[bytes] | None = None
-        self._initial_vocab_size = len(self._build_initial_vocabulary()) + len(self._specials)
+
+    @property
+    def vocabulary(self) -> List[str]:
+        return [
+            BytePrinter.format_byte_token(v)
+            for v in sorted(self.vocab)
+        ]
+        
 
     def display_words(self):
         for w in self._words:
@@ -130,51 +134,19 @@ class BPETrainer:
         """预处理：分词、添加边界标记、统计频率"""
         # 1. 标准化文本
         text = normalize(text)
+
         # 2. 基础分词
-        raw_words = pre_tokenize(text)
+        raw_words = regex.findall(self.pat_str, text)
 
         # 3. 统计词频
         counter = Counter(raw_words)
         return [
-            TokenizedWord(
-                text=word,
-                frequency=freq,
-                tokens=split_word(word),
+            TokenizedWord.from_text(
+                word=word,
+                freq=freq,
             )
             for word, freq in counter.items()
         ]
-    
-    @property
-    def merges(self) -> List[Tuple[bytes, bytes]]:
-        return self._merges
-    
-    @property
-    def vocabulary(self) -> List[bytes]:
-        """懒加载：仅在需要时构建完整词汇表"""
-        if self._vocabulary is None:
-            self._vocabulary = sorted(self._build_vocabulary_from_merges())
-        return self._vocabulary
-    
-    @property
-    def current_vocab_size(self) -> int:
-        return self._initial_vocab_size + len(self._merges)
-    
-    def _build_initial_vocabulary(self) -> Set[bytes]:
-        """
-        Example: ['e', 'n', 'r', 's', 't', 'w']
-        """
-        alphabet: Set[bytes] = set()
-
-        for word in self._words:
-            alphabet.update(split_word(word.text, False))
-
-        return alphabet
-    
-    def _build_vocabulary_from_merges(self) -> Set[bytes]:
-        vocab = self._build_initial_vocabulary()
-        for pair in self._merges:
-            vocab.add(pair[0] + pair[1])
-        return vocab
     
     def _compute_pair_freqencies(self):
         freq_table = PairFrequencyTable()
@@ -190,13 +162,11 @@ class BPETrainer:
             tw.apply_merge(pair)
 
     def train(self, target_vocab_size: int):        
-        if self.current_vocab_size >= target_vocab_size:
+        if len(self.vocab) >= target_vocab_size:
             return
 
-        # What if vocab len never reached k?
-        # 持续合并，直到达到目标大小或无法继续
         step = 0
-        while self.current_vocab_size < target_vocab_size:
+        while len(self.vocab) < target_vocab_size:
             print(f'\nStep {step}:')
             print(f'  Words before merge::')
             self.display_words()
@@ -223,8 +193,10 @@ class BPETrainer:
             print(f'  After merged best pair: {best_pair}')
             self.display_words()
 
-            self._merges.append(best_pair.pair) # 每次 append，vocab_size +1
+            self.merges.append(best_pair.pair) # 每次 append，vocab_size +1
+            self.vocab.add(best_pair.merged_token)
+            
             print(f'  Merge rules:')
-            print(self._merges)
+            print(self.merges)
             step += 1
             print(f"Finished step {step}\n{'='*50}")
