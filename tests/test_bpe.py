@@ -6,9 +6,6 @@ from slp3.chapter2.bpe_trainer import (
     TokenizedWord,
     BPETrainer,
 )
-from slp3.chapter2.pretokenizer import (
-    pre_tokenize,
-)
 
 merge_pairs = [
     MergePair(first=b"n", second=b"e", frequency=4),
@@ -91,21 +88,21 @@ class TestTokenizedWord(unittest.TestCase):
         print(f'After merge: {word}, {len(word.tokens)}')
 
 
-class TestBPETrainer(unittest.TestCase):
-    def test_words(self):
-        trainer = BPETrainer(text)
+class TestByteLevelTrainer(unittest.TestCase):
+    def test_trainer(self):
+        gpt2_pattern = (
+            r"""'s|'t|'re|'ve|'m|'ll|'d|\p{Script=Han}| ?[\p{L}]+| ?[\p{N}]+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"""
+        )
+        trainer = BPETrainer(
+            'Hello，世界。今天天气真好。',
+            pat_str=gpt2_pattern
+        )
 
-        self.assertEqual(len(trainer._words), 4)
-        print('\nTraining corpus')
+        trainer.train(306)
+
         trainer.display_words()
-
-        table = trainer._compute_pair_freqencies()
-        print(f'Pair frequency table: {table}')
-
-        most_freq = table.get_most_frequent()
-        print(f'Most freqent pair: {most_freq}')
-
-        trainer.train(50)
+        print(trainer.vocabulary)
+        print(trainer.merges)
 
 
 if __name__ == '__main__':
