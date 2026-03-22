@@ -2,8 +2,8 @@ from .tainer import (
     MergePair,
     TokenizedWord,
     PairFrequencyTable,
-    BPETokenizerTrainer,
+    CharLevelTrainer,
 )
 from .encoder import (
-    BPEEncoder,
+    CharLevelEncoder,
 )

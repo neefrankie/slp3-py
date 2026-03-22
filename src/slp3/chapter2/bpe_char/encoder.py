@@ -70,7 +70,7 @@ class TokenSequence:
         return self.tokens
 
 
-class BPEEncoder:
+class CharLevelEncoder:
     EOF = '<|endoftext|>'
     UNK = '<|unk|>'
 

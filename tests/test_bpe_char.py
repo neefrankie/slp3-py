@@ -3,9 +3,9 @@ import unittest
 from slp3.chapter2.bpe_char import (
     MergePair,
     PairFrequencyTable,
-    BPETokenizerTrainer,
+    CharLevelTrainer,
     TokenizedWord,
-    BPEEncoder
+    CharLevelEncoder
 )
 
 merge_pairs = [
@@ -73,21 +73,21 @@ class TesTokenizedWord(unittest.TestCase):
 class TestBPETrainer(unittest.TestCase):
 
     def test_word_frequency(self):
-        trainer = BPETokenizerTrainer(text)
+        trainer = CharLevelTrainer(text)
         self.assertEqual(len(trainer._words), 4)
 
     def test_initial_vocab(self):
-        trainer = BPETokenizerTrainer(text)
+        trainer = CharLevelTrainer(text)
         vocab = trainer._build_initial_vocabulary()
         print(vocab)
 
     def test_most_frequent(self):
-        trainer = BPETokenizerTrainer(text)
+        trainer = CharLevelTrainer(text)
         most_freq = trainer._compute_pair_freqencies().get_most_frequent()
         print(most_freq)
 
     def test_train(self):
-        trainer = BPETokenizerTrainer(text)
+        trainer = CharLevelTrainer(text)
 
         trainer.train(target_vocab_size=50)
         print('\nMerges:')
@@ -100,11 +100,11 @@ class TestBPETrainer(unittest.TestCase):
 class TestBPEEncoder(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls._trainer = BPETokenizerTrainer(text)
+        cls._trainer = CharLevelTrainer(text)
         cls._trainer.train(target_vocab_size=50)
 
     def test_tokenizer_word(self):
-        tokenized = BPEEncoder(
+        tokenized = CharLevelEncoder(
             self._trainer.merges,
             self._trainer.vocabulary,
         )
@@ -113,7 +113,7 @@ class TestBPEEncoder(unittest.TestCase):
         print(tokenized)
 
     def test_encode(self):
-        encoder = BPEEncoder(
+        encoder = CharLevelEncoder(
             merges=self._trainer.merges,
             vocab=self._trainer.vocabulary
         )

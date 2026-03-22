@@ -125,7 +125,7 @@ def normalize(text: str) -> str:
     
     return text
 
-class BPETokenizerTrainer:
+class CharLevelTrainer:
     def __init__(
             self,
             text: str,
