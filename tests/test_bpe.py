@@ -4,7 +4,10 @@ from slp3.chapter2.bpe_trainer import (
     MergePair,
     PairFrequencyTable,
     TokenizedWord,
-    BPETrainer,
+    ByteTrainer,
+)
+from slp3.chapter2.bpe_encoder import (
+    ByteEncoder
 )
 
 merge_pairs = [
@@ -17,7 +20,11 @@ merge_pairs = [
     MergePair(first=b"e", second=b"s", frequency=1)
 ]
 
-text = 'set new new renew reset renew'
+text = 'set new new renew reset renew. Hello，世界。今天天气真好。'
+
+gpt2_pattern = (
+    r"""'s|'t|'re|'ve|'m|'ll|'d|\p{Script=Han}| ?[\p{L}]+| ?[\p{N}]+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"""
+)
 
 class TestMergePair(unittest.TestCase):
     def test_add(self):
@@ -90,10 +97,7 @@ class TestTokenizedWord(unittest.TestCase):
 
 class TestByteLevelTrainer(unittest.TestCase):
     def test_trainer(self):
-        gpt2_pattern = (
-            r"""'s|'t|'re|'ve|'m|'ll|'d|\p{Script=Han}| ?[\p{L}]+| ?[\p{N}]+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"""
-        )
-        trainer = BPETrainer(
+        trainer = ByteTrainer(
             'Hello，世界。今天天气真好。',
             pat_str=gpt2_pattern
         )
@@ -104,6 +108,24 @@ class TestByteLevelTrainer(unittest.TestCase):
         print(trainer.vocabulary)
         print(trainer.merges)
 
+class TestByteLevelEncoder(unittest.TestCase):
+    def test_encode(self):
+        print('\nTest byte-level encoder...')
+        trainer = ByteTrainer(text, pat_str=gpt2_pattern)
+        trainer.train(target_vocab_size=306)
+
+        encoder = ByteEncoder(
+            merges=trainer.merges,
+            vocab=sorted(trainer.vocab),
+            pat_str=gpt2_pattern,
+        )
+
+        ids = encoder.encode(text)
+        print('\nIDs:')
+        print(ids)
+
+        decoded = encoder.decode(ids)
+        print(decoded) 
 
 if __name__ == '__main__':
     unittest.main()
