@@ -27,10 +27,10 @@ class ByteTokenSequence:
         self.tokens = tokens.copy()
 
     def iter_pairs(self):
-        for i in range(len(self.tokens) - 1):
+        for i, pair in enumerate(zip(self.tokens[:-1], self.tokens[1:])):
             yield ByteMergeCandidate(
                 position=i,
-                pair=(self.tokens[i], self.tokens[i + 1])
+                pair=pair
             )
 
     def find_best_merge(self, merge_ranks: Dict[Tuple[bytes, bytes], int]):

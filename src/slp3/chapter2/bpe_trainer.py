@@ -87,10 +87,10 @@ class TokenizedWord:
         return f"ByteTokenizedWord(text='{self.text}', tokens={self.tokens})"
     
     def iter_pairs(self):
-        for i in range(len(self.tokens) - 1):
+        for a, b in zip(self.tokens[:-1], self.tokens[1:]):
             yield MergePair(
-                first=self.tokens[i],
-                second=self.tokens[i + 1],
+                first=a,
+                second=b,
                 frequency=self.frequency
             )
 
