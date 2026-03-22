@@ -19,7 +19,7 @@ class MergePair:
         return f"({first_str}, {second_str}): {self.frequency}"
     
     def __repr__(self) -> str:
-        return f"BytemergePair(first=0x{self.first.hex()}, second=0x{self.second.hex()}, frequency={self.frequency})"
+        return f"ByteMergePair(first=0x{self.first.hex()}, second=0x{self.second.hex()}, frequency={self.frequency})"
     
     @property
     def merged_token(self) -> bytes:
