@@ -103,7 +103,7 @@ class TokenizedWord:
             else:
                 i += 1
 
-class BPETrainer:
+class ByteTrainer:
     def __init__(
             self,
             text: str,

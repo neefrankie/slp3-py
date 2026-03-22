@@ -70,7 +70,7 @@ class TesTokenizedWord(unittest.TestCase):
         word.apply_merge(MergePair(first='n', second='e', frequency=2))
         self.assertEqual(word.tokens, ['r', 'e', 'ne', 'w'])
 
-class TestBPETrainer(unittest.TestCase):
+class TestCharTrainer(unittest.TestCase):
 
     def test_word_frequency(self):
         trainer = CharLevelTrainer(text)
@@ -97,7 +97,7 @@ class TestBPETrainer(unittest.TestCase):
         print(trainer.vocabulary)
 
 
-class TestBPEEncoder(unittest.TestCase):
+class TestCharEncoder(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls._trainer = CharLevelTrainer(text)
