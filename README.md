@@ -2,6 +2,12 @@
 
 This is an attempt to implement the pseudo code described in the book [Speech and Language Processing](https://web.stanford.edu/~jurafsky/slp3/)
 
+## Notes
+
+- [How BPE is trained](./notes/chapter2/bpe-training.md)
+- [How to use heapq](./notes/chapter2/bpe-heapq.md)
+- [Why ChatGPT use Ġ as Space?](./notes/chapter2/dotg-as-space.md)
+
 ## Progress
 
 - [Chapter 2](./src/chapter2)
