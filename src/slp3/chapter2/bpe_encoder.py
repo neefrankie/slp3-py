@@ -35,12 +35,12 @@ class ByteTokenSequence:
 
     def find_best_merge(self, merge_ranks: Dict[Tuple[bytes, bytes], int]):
         candidate: ByteMergeCandidate | None = None
-        best_rank = -1
+        best_rank = float('inf')
 
         for cand in self.iter_pairs():
             if cand.pair in merge_ranks:
                 rank = merge_ranks[cand.pair]
-                if rank > best_rank:
+                if rank < best_rank:
                     candidate = cand
                     best_rank = rank
 
