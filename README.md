@@ -16,3 +16,4 @@ This is an attempt to implement the pseudo code described in the book [Speech an
     - Character-pair training
     - Character-pair encoding
     - Port ChatGPT's tiktoken
+    - Minimum Edit Distance
