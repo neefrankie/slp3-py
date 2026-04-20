@@ -2,6 +2,13 @@
 
 This is an attempt to implement the pseudo code described in the book [Speech and Language Processing](https://web.stanford.edu/~jurafsky/slp3/)
 
+## Resources
+
+### Berkely Restaurant Project
+
+* Paper: [Berkeley Restaurant Project](https://web.stanford.edu/~jurafsky/icslp-red.pdf)
+* Dateset: [The Berkeley Restaurant Project (BeRP) Transcripts](https://github.com/wooters/berp-trans).
+
 ## Notes
 
 - [How BPE is trained](./notes/chapter2/bpe-training.md)
