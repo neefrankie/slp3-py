@@ -6,7 +6,7 @@ Let's pick 256 printable characters from the beginning of the table and dump tho
 
 0000-001F are not printable. Dump them.
 
-0020 is space and space is printable but not very distinguishable to human eyes. Dump them.
+0020 is space and space is printable but not very distinguishable to human eyes. Drop it.
 
 0021-007E are printable. Keep them.
 
@@ -20,10 +20,11 @@ Let's pick 256 printable characters from the beginning of the table and dump tho
 
 00FF is 255. Now your are reaching the final number in 2^8. However, you have only got 188 printable characters. You need more characters to fill the holes of not-printable characters.
 
-Continue to select printable characters from next position 0100 (which is Ā). There're plenty of them starting from this position. We select 68 more and stop at 0143.
+Continue to select printable characters from next position 0100 (which is Ā). There're plenty of them starting from this position. 
+We select 68 more and stop at 0143.
 
 Now we should have a visible character representing space. Where is it?
 
-On the unicode table, space is 0020 (position 32. Do forget the the first position is 0). 0100 + 0020 -> 0120, which is Ġ. 
+On the unicode table, space is 0020 (position 32. Don't forget the the first position is 0). 0100 + 0020 -> 0120, which is Ġ. 
 
 There's a saying that Ġ is specifically chosen to represent space. No. It's coincidence.
